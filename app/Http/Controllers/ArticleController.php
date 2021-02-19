@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Models\Article as Article;
-
+use App\Models\Like;
 use Illuminate\Foundation\Auth\User as AuthUser;
 use Illuminate\Support\Facades\Hash;
 use PHPUnit\Util\Json;
@@ -22,7 +22,7 @@ class ArticleController extends Controller
     {
         // return(Article::all());
 
-        return response(Article::with('category')->get(), 200);
+        return response(Article::with('category')->withCount('likes')->get(), 200);
     }
 
     /**
@@ -45,13 +45,13 @@ class ArticleController extends Controller
     {
         $validation =  $this->validate($request, [
             'title' => 'required',
-            // 'category' => 'required',
+            'id_category' => 'required',
             'slug' => 'required',
             'short_text' => 'required',
         ]);
 
-        $user = Article::create($request->all());
-        return   $user->update();
+
+        return  $user = Article::create($request->all());
     }
 
     /**
@@ -104,5 +104,34 @@ class ArticleController extends Controller
     public function destroy($id)
     {
         return   Article::find($id)->delete();
+    }
+    public function like(Request $request)
+    {
+        $exist = Like::where('id_article', $request->id_article)
+            ->where('id_user', $request->user_id)->first();
+
+        if (!$exist) {
+            $new_like = new Like();
+            $new_like->id_article = $request->id_article;
+            $new_like->id_user = $request->user_id;
+            $new_like->save();
+        }
+
+        return Like::where('id_article', $request->id_article)->count();
+    }
+    public function picture(Request $request)
+    {
+        if ($request->picture) {
+            $request->picture->storeAs(
+                'picture',
+                $request->picture->getClientOriginalName(),
+                ['disk' => 'public_uploads']
+            );
+            $article = Article::find($request->id_article);
+            $article->picture = $request->picture->getClientOriginalName();
+            $article->save();
+        }
+
+        return true;
     }
 }

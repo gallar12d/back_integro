@@ -16,4 +16,9 @@ class Article extends Model
     {
         return $this->hasOne(Category::class, 'id_category', 'id_category');
     }
+
+    public function likes(){
+        return $this->hasMany(Like::class, 'id_article', 'id');
+
+    }
 }

@@ -31,6 +31,9 @@ Route::group(['middleware' => ['auth:sanctum', 'cors']], function () {
         'categories' => CategoryController::class,
 
     ]);
+    Route::post("/like", [ArticleController::class, 'like']);
+    Route::post("/picture", [ArticleController::class, 'picture']);
+
 });
 Route::group(['middleware' => 'cors'], function () {
     Route::post("/login", [UserController::class, 'login']);
