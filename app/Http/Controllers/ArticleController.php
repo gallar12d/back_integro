@@ -22,7 +22,7 @@ class ArticleController extends Controller
     {
         // return(Article::all());
 
-        return response(Article::with('category')->withCount('likes')->get(), 200);
+        return response(Article::with('category')->withCount('likes')->orderBy('id', 'desc')->get(), 200);
     }
 
     /**
